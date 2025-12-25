@@ -129,7 +129,7 @@ export default function Skills() {
                   ></div>
                   
                   <div className="relative flex flex-col items-center w-full">
-                    <div className="mb-2 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 transition-all duration-300 group-hover:ring-2 group-hover:ring-gray-200 dark:group-hover:ring-gray-600" style={{ ringColor: tech.color }}>
+                    <div className="mb-2 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 transition-all duration-300 group-hover:ring-2 group-hover:ring-gray-200 dark:group-hover:ring-gray-600">
                       <IconComponent 
                         className="text-2xl sm:text-3xl transition-all duration-300" 
                         style={{ color: tech.color }}
