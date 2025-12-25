@@ -130,10 +130,11 @@ export default function Skills() {
                   
                   <div className="relative flex flex-col items-center w-full">
                     <div className="mb-2 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 transition-all duration-300 group-hover:ring-2 group-hover:ring-gray-200 dark:group-hover:ring-gray-600">
-                      <IconComponent 
-                        className="text-2xl sm:text-3xl transition-all duration-300" 
-                        style={{ color: tech.color }}
-                      />
+                      <div style={{ color: tech.color }}>
+                        <IconComponent 
+                          className="text-2xl sm:text-3xl transition-all duration-300" 
+                        />
+                      </div>
                     </div>
                     <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 text-center leading-tight">
                       {tech.name}
