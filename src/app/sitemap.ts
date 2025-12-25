@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://your-domain.vercel.app' // Update dengan domain kamu setelah deploy
+  const baseUrl = 'https://rafly-juliano.vercel.app'
 
   return [
     {

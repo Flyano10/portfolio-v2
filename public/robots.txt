@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://your-domain.vercel.app/sitemap.xml
+Sitemap: https://rafly-juliano.vercel.app/sitemap.xml
 

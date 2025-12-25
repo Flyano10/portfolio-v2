@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://your-domain.vercel.app", // Update dengan domain kamu setelah deploy
+    url: "https://rafly-juliano.vercel.app",
     title: "Rafly Juliano - Junior Web Developer Portfolio",
     description: "Junior Web Developer specializing in Frontend & Backend Development. Building modern web applications with Laravel & Next.js.",
     siteName: "Rafly Juliano Portfolio",
