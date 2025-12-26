@@ -124,7 +124,6 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
   };
 
   const openModal = (imgIndex: number) => {
-    console.log('Opening modal for image index:', imgIndex);
     setCurrentImageIndex(imgIndex);
     setIsModalOpen(true);
     document.body.style.overflow = 'hidden'; // Prevent background scroll
@@ -170,14 +169,13 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
       transition={{ duration: 0.6, delay: index * 0.15 }}
       className="group relative"
     >
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 flex flex-col h-full">
+      <div className="relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 flex flex-col h-full">
         {/* Image Gallery Section */}
-        <div className="relative aspect-[16/9] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-hidden flex-shrink-0">
+        <div className="relative aspect-video bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-hidden flex-shrink-0">
           {/* Main Image Display */}
           <div 
-            className="relative w-full h-full bg-white dark:bg-gray-800 cursor-pointer"
+            className="relative w-full h-full bg-white dark:bg-gray-800 cursor-zoom-in"
             onClick={() => {
-              console.log('Image container clicked, opening modal');
               openModal(currentImageIndex);
             }}
           >
@@ -200,7 +198,6 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
                     alt={`${project.title} - Image ${currentImageIndex + 1}`}
                     className="w-full h-full object-contain pointer-events-none"
                     onError={(e) => {
-                      console.error('Image failed to load:', project.images[currentImageIndex]);
                       handleImageError(currentImageIndex);
                     }}
                     loading="eager"
@@ -210,8 +207,16 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
               </motion.div>
             </AnimatePresence>
 
+            {/* Zoom Icon Hint */}
+            <div className="absolute top-4 left-4 px-2.5 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+              </svg>
+              Click to zoom
+            </div>
+
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
             {/* Navigation Arrows */}
             {project.images.length > 1 && (
@@ -241,21 +246,24 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
               </>
             )}
 
-            {/* Image Counter */}
+            {/* Image Counter - Always visible */}
             {project.images.length > 1 && (
-              <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium shadow-lg">
                 {currentImageIndex + 1} / {project.images.length}
               </div>
             )}
 
-            {/* Image Indicators */}
+            {/* Image Indicators - Always visible */}
             {project.images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                 {project.images.map((_, idx) => (
                   <button
                     key={idx}
-                    onClick={() => goToImage(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goToImage(idx);
+                    }}
+                    className={`h-2 rounded-full transition-all duration-300 shadow-sm ${
                       idx === currentImageIndex
                         ? 'w-8 bg-white'
                         : 'w-2 bg-white/50 hover:bg-white/75'
@@ -302,7 +310,7 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
         </div>
 
         {/* Content Section */}
-        <div className="p-4 md:p-5 flex flex-col flex-grow">
+        <div className="p-3 md:p-4 flex flex-col flex-grow">
           {/* Title Section */}
           <div className="mb-2">
             {project.subtitle && (
@@ -319,7 +327,7 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
               initial={{ opacity: 0, x: -20 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.15 + 0.25 }}
-              className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1.5 flex items-center gap-1.5 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors"
+              className="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-1.5 flex items-center gap-1.5 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors"
             >
               {project.title}
               <motion.div
@@ -336,7 +344,7 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
-            className="text-gray-600 dark:text-gray-300 mb-3 leading-relaxed text-xs md:text-sm flex-grow"
+            className="text-gray-600 dark:text-gray-300 mb-2.5 leading-relaxed text-xs flex-grow line-clamp-3"
           >
             {project.description}
           </motion.p>
@@ -346,12 +354,12 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: index * 0.15 + 0.35 }}
-            className="mb-3"
+            className="mb-2.5"
           >
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+            <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
               Tech Stack
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1">
               {project.tech.map((tech, techIndex) => {
                 const IconComponent = techIcons[tech] || SiJavascript;
                 const techColor = techColors[tech] || '#6B7280';
@@ -364,19 +372,23 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
                     whileHover={{ scale: 1.05, y: -1 }}
                     className="relative group/tech"
                   >
-                    <div className="p-1.5 rounded-md bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-default border border-gray-200 dark:border-gray-600">
+                    <div className="p-1 rounded-md bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-default border border-gray-200 dark:border-gray-600">
                       <div style={{ color: techColor }}>
                         <IconComponent 
-                          className="text-lg md:text-xl" 
+                          className="text-base md:text-lg" 
                         />
                       </div>
                     </div>
-                    {/* Tooltip */}
-                    <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover/tech:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
-                      <div className="bg-gray-900 dark:bg-gray-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+                    {/* Tooltip - Always visible below icon */}
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-0 group-hover/tech:opacity-100 md:group-hover/tech:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
+                      <div className="bg-gray-900 dark:bg-gray-800 text-white text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap shadow-lg">
                         {tech}
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-800"></div>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-b-[4px] border-transparent border-b-gray-900 dark:border-b-gray-800"></div>
                       </div>
+                    </div>
+                    {/* Mobile: Show tooltip on tap */}
+                    <div className="md:hidden absolute -top-1 -right-1 text-[8px] bg-gray-900 dark:bg-gray-800 text-white px-1 rounded opacity-0 group-hover/tech:opacity-100 pointer-events-none z-30 font-medium">
+                      {tech.substring(0, 1)}
                     </div>
                   </motion.div>
                 );
@@ -453,7 +465,7 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.3 }}
-              className="relative max-w-7xl w-full max-h-[90vh] flex items-center justify-center"
+              className="relative max-w-7xl w-full h-full max-h-[90vh] flex items-center justify-center px-4 py-20"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Previous Button */}
@@ -467,10 +479,10 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
                     e.stopPropagation();
                     handleModalPrev();
                   }}
-                  className="absolute left-4 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white transition-colors z-[10001] cursor-pointer"
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white transition-colors z-[10001] cursor-pointer"
                   aria-label="Previous image"
                 >
-                  <HiChevronLeft className="w-6 h-6" />
+                  <HiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
                 </motion.button>
               )}
 
@@ -484,7 +496,7 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
-                  className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+                  className="max-w-full max-h-[60vh] md:max-h-[70vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
                   onError={() => handleImageError(currentImageIndex)}
                   onClick={(e) => e.stopPropagation()}
                 />
@@ -501,21 +513,21 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
                     e.stopPropagation();
                     handleModalNext();
                   }}
-                  className="absolute right-4 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white transition-colors z-[10001] cursor-pointer"
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white transition-colors z-[10001] cursor-pointer"
                   aria-label="Next image"
                 >
-                  <HiChevronRight className="w-6 h-6" />
+                  <HiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
                 </motion.button>
               )}
 
               {/* Image Counter */}
               {project.images.length > 1 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
+                  exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: 0.3 }}
-                  className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm text-white text-sm font-medium pointer-events-none"
+                  className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs md:text-sm font-medium pointer-events-none z-[10001]"
                 >
                   {currentImageIndex + 1} / {project.images.length}
                 </motion.div>
@@ -528,7 +540,7 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
                   transition={{ delay: 0.4 }}
-                  className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 max-w-full overflow-x-auto px-4"
+                  className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 md:gap-2 max-w-[90vw] overflow-x-auto px-2 py-2 rounded-xl bg-black/30 backdrop-blur-sm scrollbar-hide"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {project.images.map((img, idx) => (
@@ -538,11 +550,11 @@ function ProjectCard({ project, index, isInView }: { project: Project; index: nu
                         e.stopPropagation();
                         setCurrentImageIndex(idx);
                       }}
-                      whileHover={{ scale: 1.1 }}
+                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`flex-shrink-0 w-16 h-10 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                      className={`flex-shrink-0 w-12 h-8 md:w-14 md:h-9 rounded-md overflow-hidden border-2 transition-all cursor-pointer ${
                         idx === currentImageIndex
-                          ? 'border-white scale-110'
+                          ? 'border-white scale-105'
                           : 'border-white/30 hover:border-white/60'
                       }`}
                     >
@@ -626,7 +638,7 @@ export default function Projects() {
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 gap-5 md:gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           {projects.map((project, index) => (
             <ProjectCard 
                 key={project.title}

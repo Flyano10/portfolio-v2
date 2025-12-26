@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import Toast from './Toast';
 
 export default function Contact() {
   const ref = useRef(null);
@@ -12,13 +13,62 @@ export default function Contact() {
     email: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error';
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    message: '',
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ isOpen: true, type, message });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    alert('Message sent! I\'ll get back to you soon.');
-    setFormData({ name: '', email: '', message: '' });
+    setIsSubmitting(true);
+
+    try {
+      // FormSubmit.co - No API key needed!
+      const response = await fetch('https://formsubmit.co/ajax/raflyjuliano62@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          _subject: `New Portfolio Contact from ${formData.name}`,
+          _template: 'box',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success === 'true' || response.ok) {
+        showToast(
+          'success',
+          'Terima kasih sudah menghubungi saya!\nSaya akan balas pesan Anda dalam 1-2 hari. 😊'
+        );
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        throw new Error('Failed to send');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showToast(
+        'error',
+        'Maaf, pesan gagal terkirim.\nSilakan email ke:\nraflyjuliano62@gmail.com'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const socialLinks = [
@@ -53,7 +103,15 @@ export default function Contact() {
   ];
 
   return (
-    <section className="relative min-h-screen pt-24 pb-20 bg-white dark:bg-gray-900 px-4 sm:px-6 lg:px-8 overflow-hidden" ref={ref}>
+    <section className="relative min-h-screen pt-24 pb-20 bg-white px-4 sm:px-6 lg:px-8 overflow-hidden" ref={ref}>
+      {/* Toast Notification */}
+      <Toast
+        isOpen={toast.isOpen}
+        onClose={() => setToast(prev => ({ ...prev, isOpen: false }))}
+        type={toast.type}
+        message={toast.message}
+      />
+
       {/* Minimal background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-40 right-20 w-64 h-64 bg-gray-100 dark:bg-gray-800/30 rounded-full blur-3xl opacity-20"></div>
@@ -148,14 +206,31 @@ export default function Contact() {
                   </div>
                   <motion.button
                     type="submit"
+                    disabled={isSubmitting}
                     whileHover={{ y: -1 }}
                     whileTap={{ y: 0 }}
-                    className="w-full px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group"
+                    className={`w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group ${
+                      isSubmitting 
+                        ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' 
+                        : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                    }`}
                   >
-                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                    Send Message
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        Send Message
+                      </>
+                    )}
                   </motion.button>
                 </form>
               </div>
